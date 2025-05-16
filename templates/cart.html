@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<header>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+</header>
+<div class="cart-container">
+    <h2 class="cart-title">Your Cart</h2>
+
+    {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="item-details">
+                        <h3 class="item-name">{{ item[1] }}</h3>
+                        <div class="item-price">₹{{ item[2] }} × {{ item[4] }}</div>
+                    </div>
+                    <div class="item-total">₹{{ item[2] * item[4] }}</div>
+                    <div class="item-actions">
+                        <a href="/remove_from_cart/{{ item[0] }}" class="remove-button">
+                            <span class="remove-icon">×</span>
+                            <span class="remove-text">Remove</span>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <div class="cart-total">
+                <span class="total-label">Total</span>
+                <span class="total-amount">₹{{ total }}</span>
+            </div>
+            
+            <div class="cart-actions">
+                <a href="/clear_cart" class="clear-cart-button">Clear Cart</a>
+                <a href="/menu" class="continue-button">Continue Shopping</a>
+                <a href="/checkout" class="checkout-button">Proceed to Checkout</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <p class="empty-message">Your cart is empty</p>
+            <a href="/menu" class="continue-button">Browse Menu</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

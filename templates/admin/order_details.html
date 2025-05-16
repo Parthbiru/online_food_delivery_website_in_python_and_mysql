@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Order Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Order #{{ order.id }} Details</h3>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row" style="display: flex; margin: -10px;">
+            <div class="col" style="flex: 1; padding: 10px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Order Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Order ID:</strong> #{{ order.id }}</p>
+                        <p><strong>Date:</strong> {{ order.order_date.strftime('%d-%m-%Y %H:%M') }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if order.status == 'Pending' %}
+                            <span class="badge" style="background-color: #ffc107;">Pending</span>
+                            {% elif order.status == 'Processing' %}
+                            <span class="badge" style="background-color: #17a2b8;">Processing</span>
+                            {% elif order.status == 'Delivered' %}
+                            <span class="badge badge-success">Delivered</span>
+                            {% elif order.status == 'Cancelled' %}
+                            <span class="badge" style="background-color: #dc3545;">Cancelled</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col" style="flex: 1; padding: 10px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Customer Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> {{ order.name }}</p>
+                        <p><strong>Phone:</strong> {{ order.phone }}</p>
+                        <p><strong>Email:</strong> {{ order.email }}</p>
+                        <p><strong>Address:</strong> {{ order.address }}, {{ order.city }}, {{ order.state }}, {{ order.pincode }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h4>Delivery Instructions</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ order.delivery_instructions or 'No special instructions' }}</p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h4>Order Items</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.item_name }}</td>
+                                <td>₹{{ "%.2f"|format(item.price) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h4>Order Summary</h4>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; justify-content: flex-end;">
+                    <div style="width: 250px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Subtotal:</span>
+                            <span>₹{{ "%.2f"|format(order.subtotal) }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Taxes:</span>
+                            <span>₹{{ "%.2f"|format(order.taxes) }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Delivery Fee:</span>
+                            <span>₹{{ "%.2f"|format(order.delivery_fee) }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">
+                            <span>Total:</span>
+                            <span>₹{{ "%.2f"|format(order.total_amount) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="POST" style="display: flex; gap: 10px;">
+                <select name="status" class="form-control">
+                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </form>
+            <div>
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

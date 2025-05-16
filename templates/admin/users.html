@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h2>User Management</h2>
+    <div class="user-actions">
+        <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Registered Users</h3>
+         <strong>Showing {{ users|length }} of {{ total_users }} users</strong>
+        <form method="GET" action="{{ url_for('admin_users') }}" class="search-form">
+            <div class="form-group" style="margin: 0;">
+                <input type="text" name="search" placeholder="Search by name or email" 
+                       value="{{ search_query }}" class="form-control" style="display: inline-block; width: auto;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                {% if search_query %}
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="{{ url_for('admin_users', search=search_query, sort='id', order='asc' if sort_by != 'id' or order == 'desc' else 'desc') }}">
+                                ID {% if sort_by == 'id' %}<i class="fas fa-caret-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('admin_users', search=search_query, sort='name', order='asc' if sort_by != 'name' or order == 'desc' else 'desc') }}">
+                                Name {% if sort_by == 'name' %}<i class="fas fa-caret-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('admin_users', search=search_query, sort='email', order='asc' if sort_by != 'email' or order == 'desc' else 'desc') }}">
+                                Email {% if sort_by == 'email' %}<i class="fas fa-caret-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if users %}
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user[0] }}</td>
+                            <td>{{ user[1] if user[1] else 'N/A' }}</td>
+                            <td>{{ user[2] if user[2] else 'N/A' }}</td>
+                            <td class="table-actions">
+                                <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></a>
+                                <a href="{{ url_for('delete_user', user_id=user[0]) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">No users found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal (existing code remains the same) -->
+{% endblock %}

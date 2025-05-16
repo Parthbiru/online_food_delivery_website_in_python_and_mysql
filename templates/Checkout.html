@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+{% block content %}
+<header>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+
+</header>
+<div class="checkout-container">
+    <h2 class="checkout-title">Checkout</h2>
+    
+    <div class="checkout-sections">
+        <!-- Order Summary Section -->
+        <div class="checkout-section order-summary">
+            <h3 class="section-title">Order Summary</h3>
+            
+            {% if cart_items %}
+                <div class="summary-items">
+                    {% for item in cart_items %}
+                        <div class="summary-item">
+                            <div class="item-info">
+                                <span class="item-name">{{ item[1] }}</span>
+                                <span class="item-quantity">× {{ item[4] }}</span>
+                            </div>
+                            <div class="item-price">₹{{ item[2] * item[4] }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="summary-totals">
+                    <div class="summary-row subtotal">
+                        <span>Subtotal</span>
+                        <span>₹{{ total }}</span>
+                    </div>
+                    <div class="summary-row delivery">
+                        <span>Delivery Fee</span>
+                        <span>₹40</span>
+                    </div>
+                    <div class="summary-row taxes">
+                        <span>Taxes</span>
+                        <span>₹{{ (total * 0.05)|round|int }}</span>
+                    </div>
+                    <div class="summary-row grand-total">
+                        <span>Total</span>
+                        <span>₹{{ total + 40 + ((total * 0.05)|round|int) }}</span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="empty-cart-message">Your cart is empty. <a href="/menu">Add some items</a> to proceed with checkout.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Customer Information Form -->
+        <div class="checkout-section customer-info">
+            <h3 class="section-title">Delivery Information</h3>
+            
+            <form action="/place_order" method="post" class="checkout-form" id="checkout-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="10-digit mobile number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" required>
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" name="pincode" pattern="[0-9]{6}" placeholder="6-digit pincode" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="delivery_instructions">Delivery Instructions (Optional)</label>
+                    <textarea id="delivery_instructions" name="delivery_instructions" rows="2" placeholder="Any special instructions for delivery"></textarea>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Payment Section -->
+        <div class="checkout-section payment-options">
+            <h3 class="section-title">Payment Method</h3>
+            
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <input type="radio" form="checkout-form" id="pay-cod" name="payment_method" value="cod" checked>
+                    <label for="pay-cod">
+                        <span class="method-name">Cash on Delivery</span>
+                        <span class="method-description">Pay when your order arrives</span>
+                    </label>
+                </div>
+                
+                <div class="payment-method">
+                    <input type="radio" form="checkout-form" id="pay-online" name="payment_method" value="online">
+                    <label for="pay-online">
+                        <span class="method-name">Online Payment</span>
+                        <span class="method-description">Credit/Debit Card, UPI, Net Banking</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="checkout-actions">
+        <a href="/cart" class="back-to-cart">Back to Cart</a>
+        <!-- <a href="/order_confirmation.html" form="checkout-form" class="place-order-btn">Place Order</a> -->
+        <button type="submit" form="checkout-form" class="place-order-btn">Place Order</button>
+    </div>
+</div>
+{% endblock %}

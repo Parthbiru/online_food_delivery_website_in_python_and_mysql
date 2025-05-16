@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Edit Item</h2>
+<form method="POST" enctype="multipart/form-data">
+    <input name="name" value="{{ item[1] }}" required>
+    <input name="price" type="number" value="{{ item[2] }}" min="1" step="0.01" required>
+    <textarea name="description" required>{{ item[4] }}</textarea>
+    <input type="file" name="image">
+    <button>Update Item</button>
+</form>
+
+{% endblock %}

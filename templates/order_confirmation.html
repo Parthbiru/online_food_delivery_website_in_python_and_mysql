@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+<header>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order_confirmation.css') }}">
+</header>
+<div class="confirmation-container">
+    <div class="confirmation-header">
+        <div class="confirmation-icon">✓</div>
+        <h2 class="confirmation-title">Order Confirmed!</h2>
+        <p class="confirmation-message">Thank you for your order. We've received your order and will start preparing it soon.</p>
+    </div>
+    
+    <div class="order-info">
+        <div class="order-details">
+            <h3>Order #{{ order[0] }}</h3>
+            <div class="order-meta">
+                <div class="order-date">
+                    <span class="label">Date:</span>
+                    <span>{{ order[9]|string }}</span>
+                </div>
+                <div class="order-status">
+                    <span class="label">Status:</span>
+                    <span class="status-badge">{{ order[10] }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="delivery-info">
+            <h3>Delivery Information</h3>
+            <p><strong>{{ order[2] }}</strong><br>
+               {{ order[5] }}<br>
+               {{ order[6] }}, {{ order[7] }} {{ order[8] }}<br>
+               <span class="phone">{{ order[2] }}</span>
+            </p>
+            
+           
+        </div>
+    </div>
+    
+    <div class="order-summary">
+        <h3>Order Summary</h3>
+        
+        <div class="ordered-items">
+            {% for item in items %}
+            <div class="ordered-item">
+                <div class="item-info">
+                    <span class="item-name">{{ item[1] }}</span>
+                    <span class="item-quantity">× {{ item[4] }}</span>
+                </div>
+                <div class="item-price">₹{{ item[2] * item[4] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="order-totals">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>₹{{ order[11] }}</span>
+            </div>
+            <div class="total-row">
+                <span>Delivery Fee</span>
+                <span>₹{{ order[13] }}</span>
+            </div>
+            <div class="total-row">
+                <span>Taxes</span>
+                <span>₹{{ order[12] }}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total</span>
+                <span>₹{{ order[14] }}</span>
+            </div>
+            <div class="payment-method">
+                <span class="label">Payment Method:</span>
+                <span>{{ 'Cash on Delivery' if order[10] == 'cod' else 'Online Payment' }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="estimated-delivery">
+        <h3>Estimated Delivery Time</h3>
+        <div class="delivery-time">30-45 minutes</div>
+        <p class="delivery-note">Our delivery partner will call you when they're close.</p>
+    </div>
+    
+    <div class="confirmation-actions">
+        <a href="/menu" class="continue-shopping">Continue Shopping</a>
+        <a href="/orders" class="view-orders">View My Orders</a>
+    </div>
+</div>
+{% endblock %}

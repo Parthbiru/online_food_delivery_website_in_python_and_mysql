@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+    <section class="hero">
+        <h1>Welcome to FoodExpress</h1>
+        <p>Delicious food delivered to your doorstep</p>
+        <a href="/menu" class="hero-btn">Order Now</a>
+    </section>
+
+    <h2>Menu</h2>
+    {% for item in items %}
+        <div>
+            <img src="{{ url_for('static', filename='uploads/' ~ item[3]) }}" width="120"><br>
+            <strong>{{ item[1] }}</strong><br>
+            ₹{{ item[2] }}<br>
+            <form method="POST" action="/add_to_cart/{{ item[0] }}">
+                <button>Buy Now 🛒</button>
+            </form>
+        </div>
+    {% endfor %}
+{% endblock %}

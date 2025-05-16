@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order-success.css') }}">
+</head>
+<body>
+    {% extends "layout.html" %}
+    {% block content %}
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h2 class="success-title">Your Order was Placed Successfully!</h2>
+        <p>Thank you for your order. We will begin preparing your delicious food right away.</p>
+        
+        <div class="order-details">
+            <div class="order-id">Order ID: #{{ order_id }}</div>
+            <p>You will receive a confirmation email shortly with your order details.</p>
+        </div>
+        
+        <div class="buttons">
+            <a href="/orders" class="home-btn view-orders">View My Orders</a>
+            <a href="/" class="home-btn">Return to Home</a>
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

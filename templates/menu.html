@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Menu</h2>
+<div class="menu-container">
+    {% for item in items %}
+        <div class="item-box">
+            <img src="{{ url_for('static', filename='uploads/' ~ item[3]) }}" alt="{{ item[1] }}" class="item-img">
+            <h3>{{ item[1] }}</h3>
+            <p class="item-price">₹{{ item[2] }}</p>
+            <p class="item-desc">{{ item[4] }}</p>
+            <form method="POST" action="/add_to_cart/{{ item[0] }}">
+                <label for="quantity-{{ item[0] }}">Qty:</label>
+                <input type="number" id="quantity-{{ item[0] }}" name="quantity" value="1" min="1" class="qty-input">
+                <button class="buy-btn">Add to Cart 🛒</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

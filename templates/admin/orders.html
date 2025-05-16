@@ -1,0 +1,181 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Orders Management{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h2>Orders Management</h2>
+    <div class="user-actions">
+        <a href="#"><i class="fas fa-bell"></i></a>
+        <a href="#"><i class="fas fa-cog"></i></a>
+        <a href="#"><i class="fas fa-user-circle"></i> Admin</a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card total-orders">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="value">{{ orders|length }}</div>
+        <div class="label">Total Orders</div>
+    </div>
+    <div class="stat-card total-revenue">
+        <i class="fas fa-dollar-sign"></i>
+        <div class="value">₹{{ '%.2f'|format(total_revenue) }}
+</div>
+        <div class="label">Total Revenue</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #28a745;">
+        <i class="fas fa-check-circle"></i>
+        <div class="value">{{ completed_orders }}</div>
+        <div class="label">Completed Orders</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #ffc107;">
+        <i class="fas fa-clock"></i>
+        <div class="value">{{ pending_orders }}</div>
+        <div class="label">Pending Orders</div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card">
+    <div class="card-header">
+        <h3>Search & Filter</h3>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('admin_orders') }}" class="search-form">
+            <div class="form-group" style="width: 250px;">
+                <input type="text" class="form-control" name="search" placeholder="Search by order ID, name or phone" value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="form-group" style="width: 150px;">
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="Pending" {% if request.args.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Processing" {% if request.args.get('status') == 'Processing' %}selected{% endif %}>Processing</option>
+                    <option value="Delivered" {% if request.args.get('status') == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if request.args.get('status') == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="form-group" style="width: 200px;">
+                <input type="date" class="form-control" name="date_from" placeholder="Date From" value="{{ request.args.get('date_from', '') }}">
+            </div>
+            <div class="form-group" style="width: 200px;">
+                <input type="date" class="form-control" name="date_to" placeholder="Date To" value="{{ request.args.get('date_to', '') }}">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary">
+                <i class="fas fa-sync"></i> Reset
+            </a>
+        </form>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card">
+    <div class="card-header">
+        <h3>All Orders</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><a href="{{ url_for('admin_orders', sort='id', order=sort_reverse if sort_by == 'id' else 'asc', **request.args) }}">ID <i class="fas fa-sort"></i></a></th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th><a href="{{ url_for('admin_orders', sort='date', order=sort_reverse if sort_by == 'date' else 'asc', **request.args) }}">Date <i class="fas fa-sort"></i></a></th>
+                        <th><a href="{{ url_for('admin_orders', sort='amount', order=sort_reverse if sort_by == 'amount' else 'asc', **request.args) }}">Amount <i class="fas fa-sort"></i></a></th>
+                        <th>Payment Method</th>
+                        <th><a href="{{ url_for('admin_orders', sort='status', order=sort_reverse if sort_by == 'status' else 'asc', **request.args) }}">Status <i class="fas fa-sort"></i></a></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.name }}</td>
+                        <td>{{ order.phone }}</td>
+                        <td>{{ order.email }}</td>
+                        <td>{{ order.order_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                        <td>{{ order.payment_method }}</td>
+                        <td>
+                            {% if order.status == 'Pending' %}
+                            <span class="badge" style="background-color: #ffc107;">Pending</span>
+                            {% elif order.status == 'Processing' %}
+                            <span class="badge" style="background-color: #17a2b8;">Processing</span>
+                            {% elif order.status == 'Delivered' %}
+                            <span class="badge badge-success">Delivered</span>
+                            {% elif order.status == 'Cancelled' %}
+                            <span class="badge" style="background-color: #dc3545;">Cancelled</span>
+                            {% endif %}
+                        </td>
+                      
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="modal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto;">
+    <div class="modal-content" style="background-color: var(--dark-light-color); margin: 5% auto; padding: 20px; width: 70%; border-radius: 5px; max-height: 80vh; overflow-y: auto;">
+        <span style="float: right; cursor: pointer; font-size: 24px;" onclick="document.getElementById('orderDetailsModal').style.display='none'">&times;</span>
+        <div id="orderDetailsContent">
+            <!-- Order details will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div id="updateStatusModal" class="modal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: var(--dark-light-color); margin: 10% auto; padding: 20px; width: 40%; border-radius: 5px;">
+        <span style="float: right; cursor: pointer; font-size: 24px;" onclick="document.getElementById('updateStatusModal').style.display='none'">&times;</span>
+        <h3>Update Order Status</h3>
+        <form id="updateStatusForm" method="POST" action="">
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Update Status</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('updateStatusModal').style.display='none'">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function viewOrderDetails(orderId) {
+        // Make AJAX request to get order details
+        fetch(`/admin/order/${orderId}/details`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('orderDetailsContent').innerHTML = data;
+                document.getElementById('orderDetailsModal').style.display = 'block';
+            });
+    }
+
+    function updateOrderStatus(orderId, currentStatus) {
+        // Set current status in the form
+        document.getElementById('status').value = currentStatus;
+        
+        // Update form action
+        document.getElementById('updateStatusForm').action = `/admin/order/${orderId}/update-status`;
+        
+        // Show modal
+        document.getElementById('updateStatusModal').style.display = 'block';
+    }
+</script>
+{% endblock %}

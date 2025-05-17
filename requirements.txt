@@ -78,7 +78,6 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 pyttsx3==2.98
 pytz==2025.2
-pywin32==310
 requests==2.32.3
 rsa==4.9.1
 setuptools==79.0.1
